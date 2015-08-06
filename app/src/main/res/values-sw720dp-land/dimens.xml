@@ -1,0 +1,4 @@
+<resources>
+    <dimen name="activity_horizontal_margin">128dp</dimen>
+	<bool name="isTablet">true</bool>
+</resources>
