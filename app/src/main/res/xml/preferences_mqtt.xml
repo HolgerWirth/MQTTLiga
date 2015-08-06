@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="@string/prefs_mqtt_title"> 
+    	<com.holger.mqttliga.SettingsEdit
+    	     android:key="broker_url"
+    	     android:title="@string/prefs_mqtt_broker"
+    	     android:summary="@string/prefs_mqtt_broker_sum"
+    	     android:defaultValue="108.61.178.24"/>
+       	<com.holger.mqttliga.SettingsEdit
+    	     android:key="broker_port"
+    	     android:title="@string/prefs_mqtt_port"
+    	     android:summary="1883"
+    	     android:inputType="number"
+    	     android:digits="0123456789"
+    	     android:defaultValue="1883"/>
+        <CheckBoxPreference
+    	     android:key="heartbeat"
+    	     android:title="@string/prefs_send_heartbeat"
+    	     android:defaultValue="true"/>      	
+    </PreferenceCategory>
+	<PreferenceCategory android:title="@string/prefs_liga_title">
+	<CheckBoxPreference
+		android:key="BL1"
+		android:title="@string/prefs_BL1"
+		android:defaultValue="true"/>
+	<CheckBoxPreference
+		android:key="BL2"
+		android:title="@string/prefs_BL2"
+		android:defaultValue="true"/>
+	</PreferenceCategory>
+	<PreferenceCategory android:title="@string/prefs_notify_title">
+    	<CheckBoxPreference
+    	     android:key="notify"
+    	     android:title="@string/prefs_notify_active"
+    	     android:defaultValue="true"/>
+    </PreferenceCategory>    
+    <PreferenceCategory android:title="@string/prefs_events_title"> 
+    	<com.holger.mqttliga.SettingsEdit
+    	     android:key="highlight"
+    	     android:title="@string/prefs_highlight_minutes"
+    	     android:summary="5"
+    	     android:inputType="number"
+    	     android:digits="0123456789"
+    	     android:defaultValue="5"/>
+       	<CheckBoxPreference
+    	     android:key="voice"
+    	     android:title="@string/prefs_voice_output"
+    	     android:defaultValue="false"/> 	
+    	 <com.holger.mqttliga.SettingsEdit
+    	     android:key="delete"
+    	     android:title="@string/prefs_delete_games"
+    	     android:summary="7"
+    	     android:inputType="number"
+    	     android:digits="0123456789"
+    	     android:defaultValue="7"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/prefs_screen_on_title"> 
+    <CheckBoxPreference
+    	     android:key="screenon"
+    	     android:title="@string/prefs_screen_on"
+    	     android:defaultValue="true"/>
+    </PreferenceCategory>    
+    <PreferenceCategory android:title="@string/prefs_info_title">
+      	<com.holger.mqttliga.SettingsDialog
+    	     android:title="@string/prefs_contact"
+    	     android:dialogMessage="@string/prefs_contact_text"  
+    	     android:summary="@string/prefs_contact_sum"/>
+      	<com.holger.mqttliga.SettingsDialog
+    	     android:title="@string/prefs_licenses"
+    	     android:dialogLayout="@layout/preferences_licenses"
+             android:negativeButtonText=""  
+    	     android:summary="@string/prefs_licenses_sum"/>
+      	<com.holger.mqttliga.SettingsDialog
+    	     android:title="@string/prefs_version"
+    	     android:focusable="false"
+    	     android:selectable="false"
+	    	 android:focusableInTouchMode="false"     
+    	     android:summary="@string/prefs_version_sum"/>
+	</PreferenceCategory>        
+</PreferenceScreen>
