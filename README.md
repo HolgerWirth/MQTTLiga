@@ -13,7 +13,7 @@ with one extremely lightweight and reliable protocol.
 The MQTT server is gathering information about the games from public sources and publishes the results as soon as
 an event occurs (start of games, goals, scorers, halftime and end of games). The server publishes the events immediately to the connected subscribers. Sure, there is a small delay compared with a live game....
 <br>
-If you connect (![discon](/app/src/main/res/drawable/connected.png?raw=true "connected")) with MQTTliga to the server you'll create a durable subscription on the server. Your subscription
+If you connect (![discon](/app/src/main/res/drawable/connected.png?raw=true "connected")) with MQTTLiga to the server you'll create a durable subscription on the server. Your subscription
 stays active for 7 days and will be renewed with every reconnect. During this period all messages from the games
 are queued on the server and are sent to your device as soon as you are online again.
 Only subscribed devices are receiving live results. So stay connected or reconnect at least once in 7 days and you'll
