@@ -21,4 +21,4 @@ get the live results of the German Bundesliga.
 <br><br>
 You can direclty download the latest app release under 'Release' on this page.
 <br><br>
-Have fun with MQTTliga - may your favourite team always win (except the games against my favourite team :-) )
+Have fun with MQTTLiga - may your favourite team always win (except the games against my favourite team :-) )
