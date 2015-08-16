@@ -11,7 +11,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Build;
-//import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -31,6 +30,10 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -240,6 +243,8 @@ public class MQTTService extends Service implements MqttCallback {
                     mClient.setCallback(MQTTService.this);  	
                      
                     if(isnewStarted) {
+                        mClient.unsubscribe("/Bundesliga/Game/#");
+
                         if (!BL1) {
                             mClient.unsubscribe("/Bundesliga/BL1/Game/#");
                         }
@@ -247,21 +252,36 @@ public class MQTTService extends Service implements MqttCallback {
                             mClient.unsubscribe("/Bundesliga/BL2/Game/#");
                         }
 
-                        String subs = null;
+                        List<String> subs_list = new ArrayList<String>();
+                        List<Integer> subs_qos = new ArrayList<Integer>();
+
                         if (BL1) {
-                            subs = "/Bundesliga/BL1/Game/#";
+                            subs_list.add("/Bundesliga/BL1/Game/#");
+                            subs_qos.add(1);
                         }
                         if (BL2) {
-                            subs = "/Bundesliga/BL2/Game/#";
+                            subs_list.add("/Bundesliga/BL2/Game/#");
+                            subs_qos.add(1);
                         }
-                        if (BL1 && BL2) {
-                            subs = "/Bundesliga/+/Game/#";
+
+                        String[] subs = new String[ subs_list.size() ];
+                        int[] qos = new int[subs_qos.size()];
+                        subs_list.toArray(subs);
+                        int q=0;
+                        for( int qosItem : subs_qos) {
+                            qos[q]=qosItem;
+                            q++;
                         }
-                        if(subs!=null) {
-                            mClient.subscribe(subs, 1);
+                        if(subs.length>0)
+                        {
+                            mClient.subscribe(subs, qos);
+                            Log.i(DEBUG_TAG, "Successfully subscribed to " + Arrays.toString(subs) +" QoS: "+Arrays.toString(qos));
+                        }
+                        else
+                        {
+                            Log.i(DEBUG_TAG, "No subscription");
                         }
                         isnewStarted = false;
-                        Log.i(DEBUG_TAG, "Successfully subscribed to "+subs);
                     }
                     if(heartbeat)
                     {

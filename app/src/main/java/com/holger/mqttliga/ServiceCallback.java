@@ -98,7 +98,7 @@ public class ServiceCallback {
 
 		String[] parts = topic.split("/");
 
-		if(parts.length<5) {
+		if(parts.length<6) {
 			return;
 		}
 		String liga = parts[2];
