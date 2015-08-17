@@ -252,8 +252,8 @@ public class MQTTService extends Service implements MqttCallback {
                             mClient.unsubscribe("/Bundesliga/BL2/Game/#");
                         }
 
-                        List<String> subs_list = new ArrayList<String>();
-                        List<Integer> subs_qos = new ArrayList<Integer>();
+                        List<String> subs_list = new ArrayList<>();
+                        List<Integer> subs_qos = new ArrayList<>();
 
                         if (BL1) {
                             subs_list.add("/Bundesliga/BL1/Game/#");
