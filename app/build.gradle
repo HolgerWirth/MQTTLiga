@@ -1,0 +1,55 @@
+apply plugin: 'com.android.application'
+
+allprojects {
+    afterEvaluate { project ->
+        def propsFile = rootProject.file('keystore.properties')
+        def configName = 'release'
+
+        if (propsFile.exists() && android.signingConfigs.hasProperty(configName)) {
+            def props = new Properties()
+            props.load(new FileInputStream(propsFile))
+            android.signingConfigs[configName].storeFile = file(props['storeFile'])
+            android.signingConfigs[configName].storePassword = props['storePassword']
+            android.signingConfigs[configName].keyAlias = props['keyAlias']
+            android.signingConfigs[configName].keyPassword = props['keyPassword']
+        }
+    }
+}
+
+android {
+    signingConfigs {
+        release {
+
+//          Release config
+
+        }
+    }
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
+    defaultConfig {
+        applicationId "com.holger.mqttliga"
+        minSdkVersion 11
+        targetSdkVersion 22
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+repositories {
+    maven { url 'https://repo.eclipse.org/content/repositories/snapshots' }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:22.2.1'
+    compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'org.eclipse.paho:mqtt-client:0.3.0-SNAPSHOT'
+}
