@@ -19,6 +19,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -69,12 +70,12 @@ public class MainActivity extends Activity {
     
         mDecorView=getWindow().getDecorView();
         mDecorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-       	 
+
             @Override
             public void onSystemUiVisibilityChange(int visibility) {
-            	if (visibility == View.VISIBLE) {
+                if (visibility == View.VISIBLE) {
                     Log.i(DEBUG_TAG, "Stop fullscreen");
-                    MQTTLiga.fullscreen=false;
+                    MQTTLiga.fullscreen = false;
                     finish();
                     startActivity(getIntent());
                 }
@@ -83,8 +84,8 @@ public class MainActivity extends Activity {
         
         Log.i(DEBUG_TAG, "OnCreate()...");
         EventBus.getDefault().registerSticky(this);
-        
-        Events myEvent = (Events) EventBus.getDefault().getStickyEvent(Events.class);
+
+        @SuppressWarnings("RedundantCast") Events myEvent = (Events) EventBus.getDefault().getStickyEvent(Events.class);
         if(myEvent != null)
         {
         	Log.i(DEBUG_TAG, "OnCreate(): Sticky event found!");
@@ -269,6 +270,7 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
+    @SuppressWarnings("unused")
     public void onEventMainThread(Events myEvent){
 
     	Log.i(DEBUG_TAG, "OnEventMainTread");
@@ -339,11 +341,11 @@ public class MainActivity extends Activity {
         }
     	if (serviceIsRunning())
     	{
-    	    menu.findItem(R.id.action_connect).setIcon(getResources().getDrawable(R.drawable.connected));
-    	}
+            menu.findItem(R.id.action_connect).setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.connected));
+        }
     	else
     	{
-    	    menu.findItem(R.id.action_connect).setIcon(getResources().getDrawable(R.drawable.notconnected));
+    	    menu.findItem(R.id.action_connect).setIcon(ContextCompat.getDrawable(getApplicationContext(),R.drawable.notconnected));
     	}
 
         return true;
@@ -370,13 +372,13 @@ public class MainActivity extends Activity {
         	if (serviceIsRunning())
         	{
                 stopMQTTService();
-                menu.findItem(R.id.action_connect).setIcon(getResources().getDrawable(R.drawable.notconnected));
+                menu.findItem(R.id.action_connect).setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.notconnected));
         	}
         	else
         	{
         		initLoad=true;
         		startMQTTService();
-        		menu.findItem(R.id.action_connect).setIcon(getResources().getDrawable(R.drawable.connected));
+        		menu.findItem(R.id.action_connect).setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.connected));
         	}
             // Launch settings activity
             return true;
