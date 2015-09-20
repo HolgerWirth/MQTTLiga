@@ -19,11 +19,12 @@ allprojects {
 android {
     signingConfigs {
         release {
-//          Release config
+            return
         }
     }
+
     compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    buildToolsVersion "23.0.1"
     defaultConfig {
         applicationId "com.holger.mqttliga"
         minSdkVersion 11
@@ -43,11 +44,11 @@ android {
     }
 }
 repositories {
-    maven { url 'https://repo.eclipse.org/content/repositories/paho-release' }
+    maven { url 'https://repo.eclipse.org/content/repositories/paho-releases' }
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:23.0.0'
+    compile 'com.android.support:support-v4:23.0.1'
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
 }
