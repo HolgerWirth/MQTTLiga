@@ -75,6 +75,10 @@
     <string name="SVS">SV Sandhausen</string>
     <string name="FCI">FC Ingolstadt</string>
     <string name="SVD">SV Darmstadt</string>
+    <string name="SGD">Dynamo Dresden</string>
+    <string name="AUE">Erzgebirge Aue</string>
+    <string name="FWK">Würzburger Kickers</string>
+    <string name="FWK_S">Würzburg</string>
 
     <string name="START">Game starts</string>
     <string name="GOALG">Goal for</string>

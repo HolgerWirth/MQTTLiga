@@ -82,4 +82,8 @@
     <string name="prefs_liga_title">Abonnements</string>
     <string name="FCI">FC Ingolstadt</string>
     <string name="SVD">SV Darmstadt</string>
+    <string name="SGD">Dynamo Dresden</string>
+    <string name="FWK">Würzburger Kickers</string>
+    <string name="FWK_S">Würzburg</string>
+    <string name="AUE">Erzgebirge Aue</string>
 </resources>
