@@ -51,6 +51,7 @@ public class MQTTService extends Service implements MqttCallback {
 
     private static final boolean         MQTT_CLEAN_SESSION = false;
 
+//    private static final String         MQTT_URL_FORMAT = "ws://%s:%d";
     private static final String         MQTT_URL_FORMAT = "tcp://%s:%d";
 
     private static final String         ACTION_START         = DEBUG_TAG + ".START"; // Action to start
@@ -213,6 +214,8 @@ public class MQTTService extends Service implements MqttCallback {
     	Log.i(DEBUG_TAG,"Connect!");
         String MQTT_BROKER = settings.getString("broker_url", "108.61.178.24");
         int MQTT_PORT = Integer.parseInt(settings.getString("broker_port", "1883"));
+//        int MQTT_PORT = 443;
+
         final Boolean BL1=settings.getBoolean("BL1", true);
         final Boolean BL2=settings.getBoolean("BL2", true);
         
@@ -227,7 +230,7 @@ public class MQTTService extends Service implements MqttCallback {
         isConnecting=true;
 
         MqttConnectOptions mOpts = new MqttConnectOptions();
-        mOpts.setKeepAliveInterval(0);
+        mOpts.setKeepAliveInterval(60);
         mOpts.setConnectionTimeout(10);
         mOpts.setCleanSession(MQTT_CLEAN_SESSION);
         

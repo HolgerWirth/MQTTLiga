@@ -16,13 +16,13 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class GameListAdapter extends BaseAdapter {
+class GameListAdapter extends BaseAdapter {
 
 	private static Events listEvent;
 	private final Context activity;
 	private static LayoutInflater inflater=null;
 
-	public GameListAdapter(Context context, Events gameEvent) {
+	GameListAdapter(Context context, Events gameEvent) {
         activity = context;
         listEvent = gameEvent;
         inflater = (LayoutInflater)activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -70,12 +70,12 @@ public class GameListAdapter extends BaseAdapter {
         if (convertView == null  || row.getTag() == null) {
     		row = inflater.inflate(R.layout.gamelist, container, false);
         	holder = new ViewHolder();
-            holder.icon = (ImageView)row.findViewById(R.id.icon);
-            holder.team1= (TextView)row.findViewById(R.id.team1);
-            holder.line1 = (TextView)row.findViewById(R.id.firstLine);
-            holder.team2= (TextView)row.findViewById(R.id.team2);
-            holder.line2 = (TextView)row.findViewById(R.id.secondLine);
-            holder.icon1 = (ImageView)row.findViewById(R.id.icon1);
+            holder.icon = row.findViewById(R.id.icon);
+            holder.team1= row.findViewById(R.id.team1);
+            holder.line1 = row.findViewById(R.id.firstLine);
+            holder.team2= row.findViewById(R.id.team2);
+            holder.line2 = row.findViewById(R.id.secondLine);
+            holder.icon1 = row.findViewById(R.id.icon1);
             row.setTag(holder);
         } else {
 			holder = (ViewHolder) row.getTag();
@@ -188,7 +188,7 @@ public class GameListAdapter extends BaseAdapter {
         
     }
 
-public class ViewHolder {
+private class ViewHolder {
         ImageView icon;
         TextView team1;
 		TextView line1;

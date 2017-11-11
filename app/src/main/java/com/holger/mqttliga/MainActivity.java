@@ -27,7 +27,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
 
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class MainActivity extends Activity {
 
@@ -54,7 +56,7 @@ public class MainActivity extends Activity {
 
         listEvent = new Events();
          
-        listview = (ListView) findViewById(R.id.listview);
+        listview = findViewById(R.id.listview);
         
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         MQTTLiga.tablet = getResources().getBoolean(R.bool.isTablet);
@@ -83,9 +85,12 @@ public class MainActivity extends Activity {
         });
         
         Log.i(DEBUG_TAG, "OnCreate()...");
-        EventBus.getDefault().registerSticky(this);
+        if(!EventBus.getDefault().isRegistered(this)) {
+            Log.i(DEBUG_TAG, "EventBus register");
+            EventBus.getDefault().register(this);
+        }
 
-        @SuppressWarnings("RedundantCast") Events myEvent = (Events) EventBus.getDefault().getStickyEvent(Events.class);
+        Events myEvent = EventBus.getDefault().getStickyEvent(Events.class);
         if(myEvent != null)
         {
         	Log.i(DEBUG_TAG, "OnCreate(): Sticky event found!");
@@ -270,9 +275,8 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
-    @SuppressWarnings("unused")
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onEventMainThread(Events myEvent){
-
     	Log.i(DEBUG_TAG, "OnEventMainTread");
     	this.listEvent = myEvent;
     	adapter = new GameListAdapter(this, this.listEvent);
