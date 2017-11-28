@@ -12,7 +12,6 @@ public class MQTTLiga extends Application {
 	public static String highlight_min;
 	public static boolean voice=false;
 	public static boolean tablet;
-	public static boolean fullscreen=false;
 	public static String delete_games;
 	public static boolean screen_on;
 	public static boolean voice_change=false;

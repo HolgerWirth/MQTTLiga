@@ -18,15 +18,15 @@ public class Events implements Serializable {
 	 */
     ArrayList<games> mygames;
 	private int type;
-	public boolean publish;
-	public int pos;
+	boolean publish;
+	int pos;
 
     public Events()
     {
             this.mygames = new ArrayList<>();
     }
 
-    public Events setGame(long ts, String topic,String liga, String event, Integer goalh, Integer goalg, Integer half, Integer hgoalh, Integer hgoalg, ArrayList<Scorer> scorer)
+    void setGame(long ts, String topic, String liga, String event, Integer goalh, Integer goalg, Integer half, Integer hgoalh, Integer hgoalg, ArrayList<Scorer> scorer)
     {
     	int found = 0;
     	
@@ -150,17 +150,15 @@ public class Events implements Serializable {
    			Collections.sort(this.mygames,new TimestampSorter());
    			pos=0;
    		}
-
-   		return this;
     }
 
 
-    public int getChanged(int i)
+    int getChanged(int i)
     {
             return this.mygames.get(i).changed;
     }
 
-    public String getScore(int i)
+    String getScore(int i)
     {
     	String text = this.mygames.get(i).goalh + " : "+ this.mygames.get(i).goalg;
     	if(!this.mygames.get(i).halfH.equals(""))
@@ -169,50 +167,87 @@ public class Events implements Serializable {
     	}
     	return text;
     }
-    public String getScorer(int i)
+    String getScorer(int i)
     {
             return this.mygames.get(i).allscorer;
     }
-    
+	String getScorerH(int i)
+	{
+		return this.mygames.get(i).allscorerH;
+	}
+	String getScorerG(int i)
+	{
+		return this.mygames.get(i).allscorerG;
+	}
+
     @SuppressLint("NewApi")
-	public void setScorer(int i,ArrayList<Scorer> scorer)
+	private void setScorer(int i, ArrayList<Scorer> scorer)
     {
     	this.mygames.get(i).allscorer = "";
+    	StringBuilder allS = new StringBuilder();
+
     	for(int t=scorer.size();t>0;t--)
     	{
-    		this.mygames.get(i).allscorer += scorer.get(t-1).name + " (" + scorer.get(t-1).minute + ".)";
+    		allS.append(scorer.get(t - 1).name).append(" (").append(scorer.get(t - 1).minute).append(".)");
     		if(t>1)
     		{
-    			this.mygames.get(i).allscorer += ", ";
+    			allS.append(", ");
     		}
     	}
+        this.mygames.get(i).allscorer = allS.toString();
+
+    	this.mygames.get(i).allscorerH = "";
+		this.mygames.get(i).allscorerG = "";
+		StringBuilder allH = new StringBuilder();
+		StringBuilder allG = new StringBuilder();
+
+		int goalg=0;
+		int goalh=0;
+    	for(int t=0;t<scorer.size();t++)
+		{
+			String score = scorer.get(t).goalh + " : "+ scorer.get(t).goalg;
+			if(scorer.get(t).goalh>goalh)
+			{
+				allH.append(" (").append(scorer.get(t).minute).append(".) ").append(scorer.get(t).name).append(" ").append(score).append("\n");
+                allG.append("\n");
+				goalh=scorer.get(t).goalh;
+			}
+			if(scorer.get(t).goalg>goalg)
+			{
+				allG.append(score).append(" ").append(scorer.get(t).name).append(" (").append(scorer.get(t).minute).append(".)\n");
+				allH.append("\n");
+				goalg=scorer.get(t).goalg;
+			}
+		}
+        this.mygames.get(i).allscorerH = allH.toString();
+        this.mygames.get(i).allscorerG = allG.toString();
     }
 
-    public boolean getHighlight(int i)
+    boolean getHighlight(int i)
     {
             return this.mygames.get(i).highlight;
     }
     
-    public String getTopic(int i)
+    String getTopic(int i)
     {
             return this.mygames.get(i).topic;
     }
-    public long getTS(int i)
+    long getTS(int i)
     {
     	return this.mygames.get(i).ts;
     }
-    public int getCount()
+    int getCount()
 	{
 		return this.mygames.size();
     }
 
-    public void setHalfTime(int i,String goalh, String goalg)
+    private void setHalfTime(int i, String goalh, String goalg)
     {
         this.mygames.get(i).halfH=goalh;
         this.mygames.get(i).halfG=goalg;
     }
     
-    public void changeGame(int i,long ts, String goalh, String goalg)
+    private void changeGame(int i, long ts, String goalh, String goalg)
     {
     		this.mygames.get(i).ts=ts;
             this.mygames.get(i).goalh = goalh;
@@ -223,12 +258,12 @@ public class Events implements Serializable {
             }
    }
     
-    public void setChanged(int i, int status)
+    void setChanged(int i, int status)
     {
             this.mygames.get(i).changed = status;
     }
 
-    public void setHighlight(int i,boolean status)
+    void setHighlight(int i, boolean status)
     {
             this.mygames.get(i).highlight = status;
     }
@@ -240,7 +275,7 @@ public class Events implements Serializable {
             this.mygames.get(i).active = active;
     }
     
-    public boolean getActive(int i)
+    boolean getActive(int i)
     {
             return this.mygames.get(i).active;
     } 
@@ -264,11 +299,12 @@ class games implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 7276157722721043183L;
-	String liga;
 	String topic;
     String goalh;
     String goalg;
     String allscorer;
+    String allscorerH;
+    String allscorerG;
     long ts;
     String halfH;
     String halfG;
@@ -279,7 +315,7 @@ class games implements Serializable {
     public games(long ts, String topic, String liga, String goalh, String goalg)
     {
     		this.ts=ts;
-			this.liga = liga;
+    		String liga1 = liga;
     		this.active = true;
     		this.changed = 1;
     		this.topic = topic; 
@@ -288,10 +324,12 @@ class games implements Serializable {
             this.halfH="";
             this.halfG="";
             this.allscorer = "";
+			this.allscorerH = "";
+			this.allscorerG = "";
             this.highlight=false;
     }
     
-    public long sortTS()
+    long sortTS()
     {
     	return ts;
     }

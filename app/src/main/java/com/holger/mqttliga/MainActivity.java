@@ -10,32 +10,32 @@ import java.io.StreamCorruptedException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ListView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     public static final String SERVICE_CLASSNAME = "com.holger.mqttliga.MQTTService";
     private Menu menu;
-    private ListView listview;
+    private RecyclerView listview;
     GameListAdapter adapter;
     Events listEvent;
     boolean initLoad;
@@ -45,17 +45,18 @@ public class MainActivity extends Activity {
     private final String tempFile = "MQTTLiga_Events.obj";
     
     private Timer HighlightTimer;
-    private View mDecorView;
-	
-	public static final String                 DEBUG_TAG = "MQTTLiga"; // Debug TAG
+    public static final String                 DEBUG_TAG = "MQTTLiga"; // Debug TAG
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        Toolbar toolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_launcher);
+//        toolbar.setOverflowIcon(getResources().getDrawable( R.drawable.ic_menu_settings));
 
         listEvent = new Events();
-         
         listview = findViewById(R.id.listview);
         
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -69,15 +70,14 @@ public class MainActivity extends Activity {
         MQTTLiga.voice=settings.getBoolean("voice", false);
         highlight_min=Integer.parseInt(MQTTLiga.highlight_min);
         delete_games=Long.parseLong(MQTTLiga.delete_games);
-    
-        mDecorView=getWindow().getDecorView();
+
+        View mDecorView = getWindow().getDecorView();
         mDecorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
 
             @Override
             public void onSystemUiVisibilityChange(int visibility) {
                 if (visibility == View.VISIBLE) {
                     Log.i(DEBUG_TAG, "Stop fullscreen");
-                    MQTTLiga.fullscreen = false;
                     finish();
                     startActivity(getIntent());
                 }
@@ -95,8 +95,10 @@ public class MainActivity extends Activity {
         {
         	Log.i(DEBUG_TAG, "OnCreate(): Sticky event found!");
         	this.listEvent = myEvent;
-        	adapter = new GameListAdapter(this, this.listEvent);
+        	adapter = new GameListAdapter(R.layout.gamelist,this.listEvent);
         	listview.setAdapter(adapter);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            listview.setLayoutManager(layoutManager);
         }
         else
         {
@@ -108,8 +110,12 @@ public class MainActivity extends Activity {
 	        	myEvent = (Events) is.readObject();
 	        	is.close();
 	        	this.listEvent = myEvent;
-	        	adapter = new GameListAdapter(this, this.listEvent);
+	        	adapter = new GameListAdapter(R.layout.gamelist,this.listEvent);
 	        	listview.setAdapter(adapter);
+	        	listview.invalidate();
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+                listview.setLayoutManager(layoutManager);
+
 			} catch (FileNotFoundException e) {
 				Log.i(DEBUG_TAG, "OnCreate(): Cache file not found!");
 			} catch (StreamCorruptedException e) {
@@ -119,11 +125,6 @@ public class MainActivity extends Activity {
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
-        }
-                
-        if(MQTTLiga.fullscreen)
-        {
-        	startFullScreen();
         }
     }
 
@@ -279,9 +280,11 @@ public class MainActivity extends Activity {
     public void onEventMainThread(Events myEvent){
     	Log.i(DEBUG_TAG, "OnEventMainTread");
     	this.listEvent = myEvent;
-    	adapter = new GameListAdapter(this, this.listEvent);
+    	adapter = new GameListAdapter(R.layout.gamelist, this.listEvent);
     	listview.setAdapter(adapter);
-    	    	
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        listview.setLayoutManager(layoutManager);
+
         if(initLoad)
         {
         	try {            
@@ -313,9 +316,11 @@ public class MainActivity extends Activity {
 
     private boolean serviceIsRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (SERVICE_CLASSNAME.equals(service.service.getClassName())) {
-                return true;
+        if (manager != null) {
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+                if (SERVICE_CLASSNAME.equals(service.service.getClassName())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -339,10 +344,7 @@ public class MainActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         this.menu=menu;
-        if(Build.VERSION.SDK_INT<19)
-        {
-        	menu.findItem(R.id.action_fullscreen).setVisible(false);
-        }
+
     	if (serviceIsRunning())
     	{
             menu.findItem(R.id.action_connect).setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.connected));
@@ -367,11 +369,6 @@ public class MainActivity extends Activity {
             startActivity(i);
             return true;
         }
-    	
-   	 	if (id == R.id.action_fullscreen) {
-   	 		startFullScreen();
-   	 		return true;
-   	 	}
         if (id == R.id.action_connect) {
         	if (serviceIsRunning())
         	{
@@ -389,20 +386,7 @@ public class MainActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-    
-    @SuppressLint("InlinedApi")
-	private void startFullScreen()
-    {
-        MQTTLiga.fullscreen=true;
-        mDecorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-              | View.SYSTEM_UI_FLAG_FULLSCREEN
-              | View.SYSTEM_UI_FLAG_IMMERSIVE);
-    }
-    
+
     private boolean deleteGames(Events myEvent)
     {
         Events xEvent = new Events();

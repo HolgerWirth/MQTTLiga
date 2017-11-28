@@ -27,7 +27,7 @@
     <string name="prefs_licenses">Licenses</string>
     <string name="prefs_licenses_sum">Details about the use of open-source-software in MQTTLiga</string>
     <string name="prefs_version">Version</string>
-    <string name="prefs_version_sum">1.0.1 (30.07.17)</string>
+    <string name="prefs_version_sum">2.0 (25.11.17)</string>
     
     <string name="BAY">Bayern Munchen</string>
     <string name="BAY_S">Bayern</string>

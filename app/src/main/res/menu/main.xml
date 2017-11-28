@@ -1,18 +1,15 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
-        android:showAsAction="never"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_menu_settings"
         android:title="@string/action_settings"/>
 
-    <item android:id="@+id/action_fullscreen"
-          android:icon="@drawable/fullscreen"
-          android:title="@string/action_fullscreen"
-          android:showAsAction="always" />
-    
         <item android:id="@+id/action_connect"
           android:icon="@drawable/notconnected"
           android:title="@string/action_connect"
-          android:showAsAction="always" />        
+          app:showAsAction="always" />
 </menu>
