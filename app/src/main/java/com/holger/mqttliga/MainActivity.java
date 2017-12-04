@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -98,7 +99,10 @@ public class MainActivity extends AppCompatActivity {
         	adapter = new GameListAdapter(R.layout.gamelist,this.listEvent);
         	listview.setAdapter(adapter);
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+            listview.addItemDecoration(new DividerItemDecoration(this,
+                    DividerItemDecoration.VERTICAL));
             listview.setLayoutManager(layoutManager);
+            listview.setHasFixedSize(true);
         }
         else
         {
@@ -114,9 +118,12 @@ public class MainActivity extends AppCompatActivity {
 	        	listview.setAdapter(adapter);
 	        	listview.invalidate();
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+                listview.addItemDecoration(new DividerItemDecoration(this,
+                        DividerItemDecoration.VERTICAL));
                 listview.setLayoutManager(layoutManager);
+                listview.setHasFixedSize(true);
 
-			} catch (FileNotFoundException e) {
+            } catch (FileNotFoundException e) {
 				Log.i(DEBUG_TAG, "OnCreate(): Cache file not found!");
 			} catch (StreamCorruptedException e) {
 				Log.i(DEBUG_TAG, "OnCreate(): Cache file corrupted!");
@@ -283,7 +290,10 @@ public class MainActivity extends AppCompatActivity {
     	adapter = new GameListAdapter(R.layout.gamelist, this.listEvent);
     	listview.setAdapter(adapter);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+//        listview.addItemDecoration(new DividerItemDecoration(this,
+//                DividerItemDecoration.VERTICAL));
         listview.setLayoutManager(layoutManager);
+        listview.setHasFixedSize(true);
 
         if(initLoad)
         {

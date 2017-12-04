@@ -9,18 +9,26 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListHolder> {
 
 	private final Events eventsList;
 	private final int itemResource;
+	private RecyclerView mRecyclerView;
 
 	GameListAdapter(int itemResource, Events eventsList) {
 		this.eventsList = eventsList;
 		this.itemResource = itemResource;
 	}
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+
+        mRecyclerView = recyclerView;
+    }
+
 	@Override
 	public GameListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
 		View view = LayoutInflater.from(parent.getContext())
 				.inflate(this.itemResource, parent, false);
-		return new GameListHolder(view);
+		return new GameListHolder(view, this, mRecyclerView);
 	}
 
 	@Override

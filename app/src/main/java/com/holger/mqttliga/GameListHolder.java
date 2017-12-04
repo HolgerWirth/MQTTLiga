@@ -4,6 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +20,7 @@ import java.util.Locale;
 
 public class GameListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-//    public static final String                 DEBUG_TAG = "MQTTLiga"; // Debug TAG
+    public static final String                 DEBUG_TAG = "MQTTLiga"; // Debug TAG
 
     private final ImageView icon;
     private final TextView team1;
@@ -35,11 +36,17 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
     private final TextView scorerListG;
     private final LinearLayout detailteams;
 
+    private final GameListAdapter gameListAdapter;
+    private final RecyclerView mRecyclerView;
+
     private int originalHeight = 0;
     private boolean isViewExpanded = false;
 
-    GameListHolder(View itemView) {
+    GameListHolder(View itemView, GameListAdapter gameListAdapter, RecyclerView mRecyclerView) {
         super(itemView);
+
+        this.mRecyclerView = mRecyclerView;
+        this.gameListAdapter = gameListAdapter;
 
         this.icon = itemView.findViewById(R.id.icon);
         this.team1= itemView.findViewById(R.id.team1);
@@ -199,11 +206,14 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
     @Override
     public void onClick(final View v) {
         Resources res = itemView.getContext().getResources();
+        final LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         int extent=0;
 
         if (originalHeight == 0) {
             originalHeight = v.getHeight();
         }
+
+        int offset = 0;
 
         // Declare a ValueAnimator object
         ValueAnimator valueAnimator;
@@ -230,15 +240,18 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
             isViewExpanded = true;
             if(( (int) (originalHeight * 1.0))>(Math.max(this.scorerListH.getMeasuredHeight(),this.scorerListG.getMeasuredHeight()))+extent) {
                 valueAnimator = ValueAnimator.ofInt(originalHeight, originalHeight + (int) (originalHeight * 1.0)); // These values in this method can be changed to expand however much you like
+                Log.i(DEBUG_TAG,"isExpanded: "+originalHeight+" ,"+(originalHeight + (int) (originalHeight * 1.0)));
             }
             else
             {
-                int offset = (Math.max(this.scorerListH.getMeasuredHeight(),this.scorerListG.getMeasuredHeight())+extent)-originalHeight;
+                offset = (Math.max(this.scorerListH.getMeasuredHeight(),this.scorerListG.getMeasuredHeight()))-originalHeight+extent;
                 valueAnimator = ValueAnimator.ofInt(originalHeight,originalHeight+(int) (originalHeight * 1.0)+offset);
+                Log.i(DEBUG_TAG,"isExpanded (offset): "+originalHeight+" ,"+(originalHeight + (int) (originalHeight * 1.0)+offset));
             }
         } else {
             isViewExpanded = false;
-            valueAnimator = ValueAnimator.ofInt(originalHeight + (int) (originalHeight * 1.0), originalHeight);
+            valueAnimator = ValueAnimator.ofInt((originalHeight+(int) (originalHeight * 1.0)+offset), originalHeight);
+            Log.i(DEBUG_TAG,"not isExpanded: "+(originalHeight + (int) (originalHeight * 1.0))+" ,"+originalHeight);
 
             Animation a = new AlphaAnimation(1.00f, 0.00f); // Fade out
 
@@ -247,16 +260,17 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
             a.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
-
                 }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
                     line2.setVisibility(View.VISIBLE);
-                    scorerlists.setVisibility(View.INVISIBLE);
-                    scorerlists.setEnabled(false);
-                    detailteams.setVisibility(View.GONE);
-                    detailteams.setEnabled(false);
+//                    scorerlists.setVisibility(View.INVISIBLE);
+//                    scorerlists.setEnabled(false);
+//                    detailteams.setVisibility(View.GONE);
+//                    detailteams.setEnabled(false);
+                    gameListAdapter.notifyItemChanged(getAdapterPosition());
+//                    gameListAdapter.notifyItemRangeChanged(getAdapterPosition()-1,getAdapterPosition());
                 }
 
                 @Override
