@@ -9,7 +9,6 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListHolder> {
 
 	private final Events eventsList;
 	private final int itemResource;
-	private RecyclerView mRecyclerView;
 
 	GameListAdapter(int itemResource, Events eventsList) {
 		this.eventsList = eventsList;
@@ -19,8 +18,6 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListHolder> {
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-
-        mRecyclerView = recyclerView;
     }
 
 	@Override
@@ -28,7 +25,7 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListHolder> {
 
 		View view = LayoutInflater.from(parent.getContext())
 				.inflate(this.itemResource, parent, false);
-		return new GameListHolder(view, this, mRecyclerView);
+		return new GameListHolder(view, this);
 	}
 
 	@Override

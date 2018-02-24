@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +19,7 @@ import java.util.Locale;
 
 public class GameListHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    public static final String                 DEBUG_TAG = "MQTTLiga"; // Debug TAG
+    private static final String                 DEBUG_TAG = "MQTTLiga"; // Debug TAG
 
     private final ImageView icon;
     private final TextView team1;
@@ -37,15 +36,14 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
     private final LinearLayout detailteams;
 
     private final GameListAdapter gameListAdapter;
-    private final RecyclerView mRecyclerView;
 
     private int originalHeight = 0;
     private boolean isViewExpanded = false;
 
-    GameListHolder(View itemView, GameListAdapter gameListAdapter, RecyclerView mRecyclerView) {
+    GameListHolder(View itemView, GameListAdapter gameListAdapter) {
         super(itemView);
 
-        this.mRecyclerView = mRecyclerView;
+//        RecyclerView mRecyclerView1 = mRecyclerView;
         this.gameListAdapter = gameListAdapter;
 
         this.icon = itemView.findViewById(R.id.icon);
@@ -76,13 +74,26 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
     void bindGameList(Events listEvent, int position) {
         String logo1;
         String logo2;
+        boolean notfound1 = false;
+        boolean notfound2 = false;
+
         Resources res = itemView.getContext().getResources();
 
         logo1=listEvent.getTopic(position).substring(0,3);
         logo2=listEvent.getTopic(position).substring(3,6);
 
         int resID1 = res.getIdentifier(logo1.toLowerCase(Locale.GERMAN),"drawable","com.holger.mqttliga");
+        if(resID1==0)
+        {
+            resID1=res.getIdentifier("ic_launcher","drawable","com.holger.mqttliga");
+            notfound1=true;
+        }
         int resID2 = res.getIdentifier(logo2.toLowerCase(Locale.GERMAN),"drawable","com.holger.mqttliga");
+        if(resID2==0)
+        {
+            resID2=res.getIdentifier("ic_launcher","drawable","com.holger.mqttliga");
+            notfound2 =true;
+        }
 
         this.icon.setImageResource(resID1);
 
@@ -167,17 +178,28 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
             else
             {
                 if(teamID1==0) {
-                    this.detail1.setText(res.getIdentifier(logo1, "string", "com.holger.mqttliga"));
+                    if(notfound1)
+                    {
+                        this.detail1.setText(logo1);
+                    }
+                    else {
+                        this.detail1.setText(res.getIdentifier(logo1, "string", "com.holger.mqttliga"));
+                    }
                 }
                 else {
-                    this.detail1.setText(teamID1);
+                        this.detail1.setText(teamID1);
                 }
                 if(teamID2==0)
                 {
-                    this.detail2.setText(res.getIdentifier(logo2, "string", "com.holger.mqttliga"));
+                    if(notfound2) {
+                        this.detail2.setText(logo2);
+                    }
+                    else {
+                        this.detail2.setText(res.getIdentifier(logo2, "string", "com.holger.mqttliga"));
+                    }
                 }
                 else {
-                    this.detail2.setText(teamID2);
+                        this.detail2.setText(teamID2);
                 }
             }
         }
@@ -206,7 +228,7 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
     @Override
     public void onClick(final View v) {
         Resources res = itemView.getContext().getResources();
-        final LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+//        final LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
         int extent=0;
 
         if (originalHeight == 0) {
