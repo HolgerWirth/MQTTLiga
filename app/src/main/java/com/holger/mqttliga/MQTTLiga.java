@@ -17,8 +17,9 @@ public class MQTTLiga extends Application {
 	public static boolean voice_change=false;
 	public static boolean BL2=false;
 	public static boolean BL1=false;
+    public static boolean overlay;
 
-	public static boolean isActivityVisible() {
+    public static boolean isActivityVisible() {
 		    return activityVisible;
 		  }  
 

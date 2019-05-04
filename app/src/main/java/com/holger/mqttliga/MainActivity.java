@@ -25,7 +25,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
 
 import org.greenrobot.eventbus.EventBus;
@@ -69,9 +68,11 @@ public class MainActivity extends AppCompatActivity {
         MQTTLiga.delete_games=settings.getString("delete", "7");
         MQTTLiga.screen_on=settings.getBoolean("screenon", true);
         MQTTLiga.voice=settings.getBoolean("voice", false);
+        MQTTLiga.overlay=settings.getBoolean("overlay",false);
         highlight_min=Integer.parseInt(MQTTLiga.highlight_min);
         delete_games=Long.parseLong(MQTTLiga.delete_games);
 
+/*
         View mDecorView = getWindow().getDecorView();
         mDecorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
 
@@ -84,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        
+*/
+
         Log.i(DEBUG_TAG, "OnCreate()...");
         if(!EventBus.getDefault().isRegistered(this)) {
             Log.i(DEBUG_TAG, "EventBus register");
@@ -339,6 +341,7 @@ public class MainActivity extends AppCompatActivity {
     private void startMQTTService() {
         final Intent intent = new Intent(this, MQTTService.class);
         intent.setAction("MQTTService.START");
+
         startService(intent);
     }
 
@@ -375,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             // Launch settings activity
-            Intent i = new Intent(this, SettingsActivity.class);
+            Intent i = new Intent(getApplicationContext(), SettingsActivity.class);
             startActivity(i);
             return true;
         }
