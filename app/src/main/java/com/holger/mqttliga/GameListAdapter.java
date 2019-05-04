@@ -1,5 +1,6 @@
 package com.holger.mqttliga;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +17,13 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListHolder> {
 	}
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
 
-	@Override
-	public GameListHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+	@NonNull
+    @Override
+	public GameListHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
 		View view = LayoutInflater.from(parent.getContext())
 				.inflate(this.itemResource, parent, false);
@@ -29,7 +31,7 @@ public class GameListAdapter extends RecyclerView.Adapter<GameListHolder> {
 	}
 
 	@Override
-	public void onBindViewHolder(GameListHolder holder, int position) {
+	public void onBindViewHolder(@NonNull GameListHolder holder, int position) {
 
 		Events eventsList = this.eventsList;
 		holder.bindGameList(eventsList,position);

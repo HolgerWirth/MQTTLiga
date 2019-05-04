@@ -99,7 +99,7 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
 
         if(listEvent.getActive(position))
         {
-            this.line1.setTypeface(null, Typeface.BOLD);
+            this.line1.setTypeface(Typeface.DEFAULT_BOLD);
         }
         this.line1.setText(listEvent.getScore(position));
         this.line2.setText(listEvent.getScorer(position));
