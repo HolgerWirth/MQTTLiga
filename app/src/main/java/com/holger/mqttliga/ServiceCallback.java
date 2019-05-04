@@ -23,31 +23,48 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import org.greenrobot.eventbus.EventBus;
 
-@SuppressLint("NewApi")
-public class ServiceCallback {
+import static android.content.Context.NOTIFICATION_SERVICE;
+
+class ServiceCallback implements View.OnTouchListener {
 	private Events myevent = new Events();
     private ContextWrapper context;
     private SharedPreferences settings;
-	TextToSpeech ttobj;
-    public static final String DEBUG_TAG = "MQTTService"; // Debug TAG
+	private TextToSpeech ttobj;
+	private Integer overlayID;
+    private WindowManager windowManager;
+    private View floatyView;
 
-    public ServiceCallback(ContextWrapper context, TextToSpeech ttobj, SharedPreferences settings) {
+	private static final String NOTIFICATION_TICKER_ID = "MQTTLiga_Ticker";
+	private static final String DEBUG_TAG = "ServiceCallback"; // Debug TAG
+
+    ServiceCallback(ContextWrapper context, TextToSpeech ttobj, SharedPreferences settings) {
         this.context = context;
         this.ttobj=ttobj;
         this.settings=settings;
-        
+
+        windowManager = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
+
         Log.i(DEBUG_TAG, "ServiceCallback(): Init");
     	FileInputStream fis;
 		try {
@@ -68,13 +85,15 @@ public class ServiceCallback {
     }
     
     @SuppressWarnings("deprecation")
-	public void doMessage(String topic, String message) throws Exception {
+	void doMessage(String topic, String message) throws Exception {
     	
         Integer goalh;
         Integer goalg;
         Integer hgoalh;
         Integer hgoalg;
         Integer half;
+        overlayID=0;
+
         long ts;
         Long delete_games;
         ArrayList<Scorer> scorerItems = new ArrayList<>();
@@ -135,6 +154,8 @@ public class ServiceCallback {
 		
         boolean notify=false;
         boolean voice = false;
+        boolean overlay = false;
+
         if(myevent.getChanged(myevent.pos)>0)
         {
         	if(settings.getBoolean("notify",true))
@@ -164,15 +185,19 @@ public class ServiceCallback {
         			{
         				resID1 = res.getIdentifier(home.toLowerCase(Locale.GERMANY),"drawable","com.holger.mqttliga");
         				title=res.getString(R.string.GOALH) + " " + home_text;
+                        overlayID=resID1;
         				notify=true;
         				voice=true;
+        				overlay=true;
         			}
         			if(event.equals("GOALG"))
         			{
         				resID1 = res.getIdentifier(guest.toLowerCase(Locale.GERMANY),"drawable","com.holger.mqttliga");
         				title=res.getString(R.string.GOALG) + " " + guest_text;
-        				notify=true;
+                        overlayID=resID1;
+                        notify=true;
         				voice=true;
+        				overlay=true;
         			}
         			if(event.equals("START"))
         			{
@@ -201,27 +226,29 @@ public class ServiceCallback {
         				final PendingIntent activity = PendingIntent.getActivity(context, 0, intent, 0);
 
         				Notification mNotification;
-        				mNotification = new NotificationCompat.Builder(context)
+        				mNotification = new NotificationCompat.Builder(context,NOTIFICATION_TICKER_ID)
         				.setContentTitle(title)
         				.setContentText(alert)
         				.setSmallIcon(resID1)
         				.setContentIntent(activity)
         				.build();
 
-        				if (Build.VERSION.SDK_INT >= 21 /**Checking for Lollipop**/)
+        				if (Build.VERSION.SDK_INT >= 21 /*Checking for Lollipop**/)
             			{
+
         					Bitmap bm = BitmapFactory.decodeResource(this.context.getResources(), resID1);
-            				mNotification = new NotificationCompat.Builder(context)
+            				mNotification = new NotificationCompat.Builder(context,NOTIFICATION_TICKER_ID)
             				.setContentTitle(title)
             				.setContentText(alert)
             				.setLargeIcon(bm)
             				.setSmallIcon(R.drawable.lolli_logo)
             				.setContentIntent(activity)
-            				.build();
+							.build();
+
             			}
 
         				final NotificationManager notificationManager = (NotificationManager)
-        						context.getSystemService(Context.NOTIFICATION_SERVICE);
+        						context.getSystemService(NOTIFICATION_SERVICE);
         				mNotification.number += 1;
         				
         				// Hide the notification after its selected
@@ -232,9 +259,29 @@ public class ServiceCallback {
                 		mNotification.defaults |= Notification.DEFAULT_VIBRATE;
                 		
                 		mNotification.ledARGB = Color.MAGENTA;
-                		
-                		notificationManager.notify(0, mNotification);
-                		
+
+						assert notificationManager != null;
+						notificationManager.notify(0, mNotification);
+
+						if(settings.getBoolean("overlay",true))
+                        {
+                            if(overlay) {
+								if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+									if (Settings.canDrawOverlays(context)) {
+
+										new Handler(Looper.getMainLooper()).post(new Runnable() {
+											@Override
+											public void run() {
+												if (overlayID > 0) {
+													addOverlayView(overlayID);
+												}
+											}
+										});
+									}
+								}
+                            }
+                        }
+
                 		if(settings.getBoolean("voice",true))
                 		{
                 			if(voice)
@@ -253,7 +300,7 @@ public class ServiceCallback {
         		}
         	}
         }
-       
+
         if(myevent.publish)
         {
         	LoadEventsTimer eventstask = new LoadEventsTimer();
@@ -279,9 +326,8 @@ public class ServiceCallback {
         {
         	Log.i(DEBUG_TAG, "myevent.publish=false");
         }
-        
     }
-    
+
     class LoadEventsTimer extends TimerTask {
         private Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -295,6 +341,68 @@ public class ServiceCallback {
            },2000);
          }
     }
+
+    private void addOverlayView(int overlayID) {
+		Log.i(DEBUG_TAG, "addoverlayView");
+
+		final WindowManager.LayoutParams params;
+			params = new WindowManager.LayoutParams(
+					WindowManager.LayoutParams.MATCH_PARENT,
+					WindowManager.LayoutParams.WRAP_CONTENT,
+					WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+					0,
+					PixelFormat.TRANSLUCENT);
+
+		params.x = 0;
+        params.y = 0;
+
+        FrameLayout interceptorLayout = new FrameLayout(context) {
+
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent event) {
+
+                // Only fire on the ACTION_DOWN event, or you'll get two events (one for _DOWN, one for _UP)
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+
+                    // Check if the HOME button is pressed
+                    if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+
+                        Log.v(DEBUG_TAG, "BACK Button Pressed");
+
+                        // As we've taken action, we'll return true to prevent other apps from consuming the event as well
+                        return true;
+                    }
+                }
+
+                // Otherwise don't intercept the event
+                return super.dispatchKeyEvent(event);
+            }
+        };
+
+        if(floatyView != null) {
+            windowManager.removeViewImmediate(floatyView);
+            Log.i(DEBUG_TAG, "Close existing Overlay");
+        }
+        floatyView = ((LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.alertwindow, interceptorLayout);
+
+        floatyView.setOnTouchListener(this);
+        Log.i(DEBUG_TAG, "Overlay ID: "+overlayID);
+        ImageView img = floatyView.findViewById(R.id.overlayimage);
+        img.setImageResource(overlayID);
+
+        windowManager.addView(floatyView, params);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+	@Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        Log.i(DEBUG_TAG, "onTouch...");
+        if (floatyView != null) {
+
+            windowManager.removeView(floatyView);
+
+            floatyView = null;
+        }
+        return true;
+    }
 }
-
-

@@ -33,7 +33,11 @@
     	     android:key="notify"
     	     android:title="@string/prefs_notify_active"
     	     android:defaultValue="true"/>
-    </PreferenceCategory>    
+		<CheckBoxPreference
+			android:key="overlay"
+			android:title="@string/prefs_notify_overlay"
+			android:defaultValue="false"/>
+	</PreferenceCategory>
     <PreferenceCategory android:title="@string/prefs_events_title"> 
     	<com.holger.mqttliga.SettingsEdit
     	     android:key="highlight"

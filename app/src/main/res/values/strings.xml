@@ -81,6 +81,7 @@
     <string name="FWK_S">Würzburg</string>
     <string name="SSV">Jahn Regensburg</string>
     <string name="HOL">Holstein Kiel</string>
+    <string name="FCM">1.FC Magdeburg</string>
 
     <string name="START">Game starts</string>
     <string name="GOALG">Goal for</string>
@@ -92,4 +93,7 @@
     <string name="prefs_liga_title">Subscriptions</string>
     <string name="prefs_BL1" translatable="false">1. Bundesliga</string>
     <string name="prefs_BL2" translatable="false">2. Bundesliga</string>
+    <string name="prefs_notify_overlay">Overlay</string>
+    <string name="Service_title">Service started:</string>
+    <string name="Service_text">Last message:</string>
 </resources>
