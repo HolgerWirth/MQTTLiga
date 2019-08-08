@@ -243,6 +243,7 @@ class ServiceCallback implements View.OnTouchListener {
             				.setLargeIcon(bm)
             				.setSmallIcon(R.drawable.lolli_logo)
             				.setContentIntent(activity)
+                            .extend(new NotificationCompat.WearableExtender().setBackground(bm))
 							.build();
 
             			}

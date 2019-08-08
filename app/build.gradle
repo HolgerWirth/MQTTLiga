@@ -24,7 +24,7 @@ android {
     }
 
     compileSdkVersion 28
-    buildToolsVersion "29.0.0-rc2"
+    buildToolsVersion "29.0.1"
     defaultConfig {
         applicationId "com.holger.mqttliga"
         minSdkVersion 14
