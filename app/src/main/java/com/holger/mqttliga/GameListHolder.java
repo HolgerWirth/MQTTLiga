@@ -183,7 +183,11 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
                         this.detail1.setText(logo1);
                     }
                     else {
-                        this.detail1.setText(res.getIdentifier(logo1, "string", "com.holger.mqttliga"));
+                        try {
+                            this.detail1.setText(res.getIdentifier(logo1, "string", "com.holger.mqttliga"));
+                        } catch (Exception e) {
+                            this.detail1.setText(logo1);
+                        }
                     }
                 }
                 else {
@@ -195,7 +199,12 @@ public class GameListHolder extends RecyclerView.ViewHolder implements View.OnCl
                         this.detail2.setText(logo2);
                     }
                     else {
-                        this.detail2.setText(res.getIdentifier(logo2, "string", "com.holger.mqttliga"));
+                        try {
+                            this.detail2.setText(res.getIdentifier(logo2, "string", "com.holger.mqttliga"));
+                        } catch (Exception e)
+                        {
+                            this.detail2.setText(logo2);
+                        }
                     }
                 }
                 else {
