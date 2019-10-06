@@ -1,15 +1,5 @@
 package com.holger.mqttliga;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +20,16 @@ import android.view.WindowManager;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,86 +58,68 @@ public class MainActivity extends AppCompatActivity {
 
         listEvent = new Events();
         listview = findViewById(R.id.listview);
-        
+
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         MQTTLiga.tablet = getResources().getBoolean(R.bool.isTablet);
-        MQTTLiga.notify=settings.getBoolean("notify", true);
-        MQTTLiga.broker_url=settings.getString("broker_url", "108.61.178.24");
-        MQTTLiga.broker_port=settings.getString("broker_port","1883");
-        MQTTLiga.highlight_min=settings.getString("highlight","5");
-        MQTTLiga.delete_games=settings.getString("delete", "7");
-        MQTTLiga.screen_on=settings.getBoolean("screenon", true);
-        MQTTLiga.voice=settings.getBoolean("voice", false);
-        MQTTLiga.overlay=settings.getBoolean("overlay",false);
-        highlight_min=Integer.parseInt(MQTTLiga.highlight_min);
-        delete_games=Long.parseLong(MQTTLiga.delete_games);
-
-/*
-        View mDecorView = getWindow().getDecorView();
-        mDecorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-
-            @Override
-            public void onSystemUiVisibilityChange(int visibility) {
-                if (visibility == View.VISIBLE) {
-                    Log.i(DEBUG_TAG, "Stop fullscreen");
-                    finish();
-                    startActivity(getIntent());
-                }
-            }
-        });
-*/
+        MQTTLiga.notify = settings.getBoolean("notify", true);
+        MQTTLiga.broker_url = settings.getString("broker_url", "108.61.178.24");
+        MQTTLiga.broker_port = settings.getString("broker_port", "1883");
+        MQTTLiga.highlight_min = settings.getString("highlight", "5");
+        MQTTLiga.delete_games = settings.getString("delete", "7");
+        MQTTLiga.screen_on = settings.getBoolean("screenon", true);
+        MQTTLiga.voice = settings.getBoolean("voice", false);
+        MQTTLiga.overlay = settings.getBoolean("overlay", false);
+        highlight_min = Integer.parseInt(MQTTLiga.highlight_min);
+        delete_games = Long.parseLong(MQTTLiga.delete_games);
 
         Log.i(DEBUG_TAG, "OnCreate()...");
-        if(!EventBus.getDefault().isRegistered(this)) {
-            Log.i(DEBUG_TAG, "EventBus register");
-            EventBus.getDefault().register(this);
-        }
+            if (!EventBus.getDefault().isRegistered(this)) {
+                Log.i(DEBUG_TAG, "EventBus register");
+                EventBus.getDefault().register(this);
+            }
 
-        Events myEvent = EventBus.getDefault().getStickyEvent(Events.class);
-        if(myEvent != null)
-        {
-        	Log.i(DEBUG_TAG, "OnCreate(): Sticky event found!");
-        	this.listEvent = myEvent;
-        	adapter = new GameListAdapter(R.layout.gamelist,this.listEvent);
-        	listview.setAdapter(adapter);
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-            listview.addItemDecoration(new DividerItemDecoration(this,
-                    DividerItemDecoration.VERTICAL));
-            listview.setLayoutManager(layoutManager);
-            listview.setHasFixedSize(true);
-        }
-        else
-        {
-        	Log.i(DEBUG_TAG, "OnCreate(): Sticky event not found!");
-        	FileInputStream fis;
-			try {
-				fis = getBaseContext().openFileInput(tempFile);
-	        	ObjectInputStream is = new ObjectInputStream(fis);
-	        	myEvent = (Events) is.readObject();
-	        	is.close();
-	        	this.listEvent = myEvent;
-	        	adapter = new GameListAdapter(R.layout.gamelist,this.listEvent);
-	        	listview.setAdapter(adapter);
-	        	listview.invalidate();
+            Events myEvent = EventBus.getDefault().getStickyEvent(Events.class);
+            if (myEvent != null) {
+                Log.i(DEBUG_TAG, "OnCreate(): Sticky event found!");
+                this.listEvent = myEvent;
+                adapter = new GameListAdapter(R.layout.gamelist, this.listEvent);
+                listview.setAdapter(adapter);
                 RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
                 listview.addItemDecoration(new DividerItemDecoration(this,
                         DividerItemDecoration.VERTICAL));
                 listview.setLayoutManager(layoutManager);
                 listview.setHasFixedSize(true);
+            } else {
+                Log.i(DEBUG_TAG, "OnCreate(): Sticky event not found!");
+                FileInputStream fis;
+                try {
+                    fis = getBaseContext().openFileInput(tempFile);
+                    ObjectInputStream is = new ObjectInputStream(fis);
+                    myEvent = (Events) is.readObject();
+                    is.close();
+                    this.listEvent = myEvent;
+                    adapter = new GameListAdapter(R.layout.gamelist, this.listEvent);
+                    listview.setAdapter(adapter);
+                    listview.invalidate();
+                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+                    listview.addItemDecoration(new DividerItemDecoration(this,
+                            DividerItemDecoration.VERTICAL));
+                    listview.setLayoutManager(layoutManager);
+                    listview.setHasFixedSize(true);
 
-            } catch (FileNotFoundException e) {
-				Log.i(DEBUG_TAG, "OnCreate(): Cache file not found!");
-			} catch (StreamCorruptedException e) {
-				Log.i(DEBUG_TAG, "OnCreate(): Cache file corrupted!");
-			} catch (IOException e) {
-				Log.i(DEBUG_TAG, "OnCreate(): Cache file IO exception!");
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+                } catch (FileNotFoundException e) {
+                    Log.i(DEBUG_TAG, "OnCreate(): Cache file not found!");
+                } catch (StreamCorruptedException e) {
+                    Log.i(DEBUG_TAG, "OnCreate(): Cache file corrupted!");
+                } catch (IOException e) {
+                    Log.i(DEBUG_TAG, "OnCreate(): Cache file IO exception!");
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-    }
 
-	@Override
+    @Override
     protected void onResume()
     {
       super.onResume();
@@ -152,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
     	  Log.i(DEBUG_TAG, "Keep screen on: "+MQTTLiga.screen_on);
     	  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
       }
-//      wl.acquire();
       
       if(highlight_min>0)
       {
@@ -308,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
         }
         else
         {
-        	final Integer pos = listEvent.pos;
+        	final int pos = listEvent.pos;
         	listview.postDelayed(new Runnable() {
         	    public void run() {
         	    	if(listEvent.getCount()>0)
