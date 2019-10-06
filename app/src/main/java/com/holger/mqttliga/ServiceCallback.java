@@ -40,6 +40,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.greenrobot.eventbus.EventBus;
@@ -140,13 +141,19 @@ class ServiceCallback implements View.OnTouchListener {
 		for(int i=0; i<jScorers.length(); i++)
 		{
 			Scorer scorer = new Scorer();
-			JSONObject json_scorer = jScorers.getJSONObject(i);
-			scorer.counter=json_scorer.getInt("ScoreG") + json_scorer.getInt("ScoreH");
-			scorer.goalg=json_scorer.getInt("ScoreG");
-			scorer.goalh=json_scorer.getInt("ScoreH");
-			scorer.name=json_scorer.getString("Scorer");
-			scorer.minute=json_scorer.getInt("Minute");
-				
+			JSONObject json_scorer;
+
+			try {
+				json_scorer = jScorers.getJSONObject(i);
+				scorer.counter=json_scorer.getInt("ScoreG") + json_scorer.getInt("ScoreH");
+				scorer.goalg=json_scorer.getInt("ScoreG");
+				scorer.goalh=json_scorer.getInt("ScoreH");
+				scorer.name=json_scorer.getString("Scorer");
+				scorer.minute=json_scorer.getInt("Minute");
+			} catch (JSONException e) {
+				e.printStackTrace();
+				break;
+			}
 			scorerItems.add(scorer);
 		}
 		
@@ -243,7 +250,6 @@ class ServiceCallback implements View.OnTouchListener {
             				.setLargeIcon(bm)
             				.setSmallIcon(R.drawable.lolli_logo)
             				.setContentIntent(activity)
-                            .extend(new NotificationCompat.WearableExtender().setBackground(bm))
 							.build();
 
             			}
