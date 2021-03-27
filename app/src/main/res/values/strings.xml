@@ -27,7 +27,7 @@
     <string name="prefs_licenses">Licenses</string>
     <string name="prefs_licenses_sum">Details about the use of open-source-software in MQTTLiga</string>
     <string name="prefs_version">Version</string>
-    <string name="prefs_version_sum">2.1 (03.08.19)</string>
+    <string name="prefs_version_sum">2.2 (27.03.21)</string>
     
     <string name="BAY">Bayern Munchen</string>
     <string name="BAY_S">Bayern</string>
@@ -98,4 +98,6 @@
     <string name="prefs_notify_overlay">Overlay</string>
     <string name="Service_title">Service started:</string>
     <string name="Service_text">Last message:</string>
+    <string name="prefs_ssl">Secure connection with SSL</string>
+    <string name="VFL">VfL Osnabrück</string>
 </resources>
