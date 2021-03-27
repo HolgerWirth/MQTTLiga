@@ -22,7 +22,7 @@ import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
-import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -36,14 +36,26 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttPersistenceException;
-import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+
+import static java.security.KeyStore.*;
 
 
 public class MQTTService extends Service implements MqttCallback {
@@ -62,6 +74,7 @@ public class MQTTService extends Service implements MqttCallback {
 
     //    private static final String         MQTT_URL_FORMAT = "ws://%s:%d";
     private static final String MQTT_URL_FORMAT = "tcp://%s:%d";
+    private static final String MQTT_SSL_URL_FORMAT = "ssl://%s:%d";
 
     private static final String ACTION_START = DEBUG_TAG + ".START"; // Action to start
     private static final String ACTION_STOP = DEBUG_TAG + ".STOP"; // Action to stop
@@ -72,8 +85,6 @@ public class MQTTService extends Service implements MqttCallback {
 
     private boolean mStarted = false; // Is the Client started?
     private String mDeviceId;                  // Device ID, Secure.ANDROID_ID
-
-    private MqttDefaultFilePersistence mDataStore = null; // Defaults to FileStore
 
     private String mKeepAliveTopic;                        // Instance Variable for Keepalive topic
 
@@ -119,7 +130,7 @@ public class MQTTService extends Service implements MqttCallback {
 
     private void initVoice() {
         settings = PreferenceManager.getDefaultSharedPreferences(this);
-        Boolean voice = settings.getBoolean("voice", false);
+        boolean voice = settings.getBoolean("voice", false);
         if (voice) {
             Log.i(DEBUG_TAG, "initVoice: voice output enanbled");
         } else {
@@ -253,18 +264,37 @@ public class MQTTService extends Service implements MqttCallback {
         stopKeepAlives();
 
         Log.i(DEBUG_TAG, "Connect!");
+        // SSL/TLS Setup
+        // Get the BKS Keystore type required by Android
+        SSLContext sslCtx = null;
+        KeyStore trustStore;
+        try {
+            trustStore = getInstance("BKS");
+            // Read the BKS file we generated (mqttliga.bks)
+            InputStream input = getResources().openRawResource(R.raw.mqttliga);
+            trustStore.load(input, null);
+            TrustManagerFactory tmf;
+            tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(trustStore);
+            sslCtx = SSLContext.getInstance("TLS");
+            sslCtx.init(null, tmf.getTrustManagers(), null);
+        } catch (KeyManagementException | CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException e) {
+            e.printStackTrace();
+        }
+
         String MQTT_BROKER = settings.getString("broker_url", "108.61.178.24");
-//        String MQTT_BROKER="192.168.1.20";
+        int MQTT_PORT = 1883;
+        String url = String.format(Locale.US, MQTT_URL_FORMAT, MQTT_BROKER, MQTT_PORT);
+        if(settings.getBoolean("SSL",true))
+        {
+            MQTT_PORT=8883;
+            url = String.format(Locale.US, MQTT_SSL_URL_FORMAT, MQTT_BROKER, MQTT_PORT);
+        }
 
-        int MQTT_PORT = Integer.parseInt(settings.getString("broker_port", "1883"));
-//        int MQTT_PORT = 443;
-
-        final Boolean BL1 = settings.getBoolean("BL1", true);
-        final Boolean BL2 = settings.getBoolean("BL2", true);
+        final boolean BL1 = settings.getBoolean("BL1", true);
+        final boolean BL2 = settings.getBoolean("BL2", true);
 
         Log.i(DEBUG_TAG, "Preferences read: MQTT Server: " + MQTT_BROKER + " Port: " + MQTT_PORT);
-
-        String url = String.format(Locale.US, MQTT_URL_FORMAT, MQTT_BROKER, MQTT_PORT);
         Log.i(DEBUG_TAG, "Connecting with URL: " + url);
 
         mDeviceId = String.format(DEVICE_ID_FORMAT,
@@ -273,11 +303,17 @@ public class MQTTService extends Service implements MqttCallback {
         isConnecting = true;
 
         MqttConnectOptions mOpts = new MqttConnectOptions();
+        // Pass the SSL context we previously configured
+        if(MQTT_PORT==8883) {
+            if (sslCtx != null) {
+                mOpts.setSocketFactory(sslCtx.getSocketFactory());
+            }
+        }
         mOpts.setKeepAliveInterval(60);
         mOpts.setConnectionTimeout(10);
         mOpts.setCleanSession(MQTT_CLEAN_SESSION);
 
-        mClient = new MqttAsyncClient(url, mDeviceId, mDataStore);
+        mClient = new MqttAsyncClient(url, mDeviceId, new MemoryPersistence());
         mClient.connect(mOpts, null, new IMqttActionListener() {
             @Override
             public void onSuccess(IMqttToken asyncActionToken) {
@@ -289,8 +325,6 @@ public class MQTTService extends Service implements MqttCallback {
                     mClient.setCallback(MQTTService.this);
 
                     if (isnewStarted) {
-                        mClient.unsubscribe("/Bundesliga/Game/#");
-
                         if (!BL1) {
                             mClient.unsubscribe("/Bundesliga/BL1/Game/#");
                         }
@@ -421,7 +455,6 @@ public class MQTTService extends Service implements MqttCallback {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void registerBroadcastReceivers() {
         if (networkConnectionMonitor == null) {
             networkConnectionMonitor = new NetworkConnectionIntentReceiver();

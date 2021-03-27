@@ -6,13 +6,10 @@
     	     android:title="@string/prefs_mqtt_broker"
     	     android:summary="@string/prefs_mqtt_broker_sum"
     	     android:defaultValue="108.61.178.24"/>
-       	<com.holger.mqttliga.SettingsEdit
-    	     android:key="broker_port"
-    	     android:title="@string/prefs_mqtt_port"
-    	     android:summary="1883"
-    	     android:inputType="number"
-    	     android:digits="0123456789"
-    	     android:defaultValue="1883"/>
+		<CheckBoxPreference
+			android:key="SSL"
+			android:title="@string/prefs_ssl"
+			android:defaultValue="true"/>
         <CheckBoxPreference
     	     android:key="heartbeat"
     	     android:title="@string/prefs_send_heartbeat"
