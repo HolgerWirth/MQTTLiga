@@ -1,13 +1,11 @@
 package com.holger.mqttliga;
 
-import android.app.Application;
 import android.util.Log;
 
-public class MQTTLiga extends Application {
+public class MQTTLiga  {
 
 	public static boolean notify=true;
 	public static String broker_url="";
-	public static String broker_port="";
 	public static boolean heartbeat;
 	public static String highlight_min;
 	public static boolean voice=false;

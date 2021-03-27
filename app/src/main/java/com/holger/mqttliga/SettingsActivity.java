@@ -19,7 +19,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
 	    super.onCreate(savedInstanceState);
 	    addPreferencesFromResource(R.xml.preferences_mqtt);
 	    getPreferenceScreen().findPreference("broker_url").setEnabled(false);
-	    getPreferenceScreen().findPreference("broker_port").setEnabled(false);
 
         Preference notifyPref = findPreference("overlay");
         notifyPref.setOnPreferenceChangeListener(this);
@@ -90,10 +89,6 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         if(key.equals("broker_url"))
         {
             MQTTLiga.broker_url = prefs.getString("broker_url", "");
-        }
-        if(key.equals("broker_port"))
-        {
-            MQTTLiga.broker_port = prefs.getString("broker_port", "1883");
         }
         if(key.equals("heartbeat"))
         {
