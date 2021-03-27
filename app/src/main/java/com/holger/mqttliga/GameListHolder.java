@@ -4,7 +4,7 @@ import android.animation.ValueAnimator;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Typeface;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
