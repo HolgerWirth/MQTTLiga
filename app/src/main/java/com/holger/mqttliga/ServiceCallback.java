@@ -230,7 +230,7 @@ class ServiceCallback implements View.OnTouchListener {
         				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
         			            | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         				
-        				final PendingIntent activity = PendingIntent.getActivity(context, 0, intent, 0);
+        				final PendingIntent activity = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         				Notification mNotification;
         				mNotification = new NotificationCompat.Builder(context,NOTIFICATION_TICKER_ID)

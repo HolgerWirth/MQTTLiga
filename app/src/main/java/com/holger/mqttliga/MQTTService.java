@@ -206,7 +206,7 @@ public class MQTTService extends Service implements MqttCallback {
         final Intent intent = new Intent(this, MQTTService.class);
         intent.setAction("MQTTService.START");
 
-        final PendingIntent activity = PendingIntent.getActivity(this, 0, intent, 0);
+        final PendingIntent activity = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         Bitmap bm = BitmapFactory.decodeResource(this.getResources(), R.drawable.lolli_logo);
 
@@ -401,7 +401,7 @@ public class MQTTService extends Service implements MqttCallback {
         i.setClass(this, MQTTService.class);
         i.setAction(ACTION_KEEPALIVE);
 
-        pi = PendingIntent.getService(this, 0, i, 0);
+        pi = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
         mAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis() + MQTT_KEEP_ALIVE,
                 MQTT_KEEP_ALIVE, pi);
@@ -415,7 +415,7 @@ public class MQTTService extends Service implements MqttCallback {
         Intent i = new Intent();
         i.setClass(this, MQTTService.class);
         i.setAction(ACTION_KEEPALIVE);
-        PendingIntent pi = PendingIntent.getService(this, 0, i, 0);
+        PendingIntent pi = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_IMMUTABLE);
 
         mAlarmManager.cancel(pi);
     }
@@ -551,7 +551,7 @@ public class MQTTService extends Service implements MqttCallback {
         Intent i = new Intent();
         i.setClass(this, MQTTService.class);
         i.setAction(ACTION_KEEPALIVE);
-        pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_NO_CREATE);
+        pi = PendingIntent.getBroadcast(this, 0, i, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
 
         return (pi != null);
     }
