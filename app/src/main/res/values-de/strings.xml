@@ -90,6 +90,7 @@
     <string name="FCM">1.FC Magdeburg</string>
     <string name="WEH">Wehen Wiesbaden</string>
     <string name="VFL">VfL Osnabrück</string>
+    <string name="HRO">Hansa Rostock</string>
 
     <string name="prefs_version_sum">2.2 (27.03.21)</string>
     <string name="prefs_notify_overlay">Overlay</string>
